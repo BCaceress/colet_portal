@@ -31,7 +31,7 @@ export default function Register() {
         { value: "implantacao", label: "Implantação" },
         { value: "desenvolvimento", label: "Desenvolvimento" },
         { value: "analista", label: "Analistas" },
-        { value: "admin", label: "Administradores" }
+        { value: "admin", label: "Administrador" }
     ];
 
     // Validate email format

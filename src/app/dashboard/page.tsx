@@ -1,6 +1,7 @@
 "use client";
 
 import Sidebar from "@/components/Sidebar";
+import { getUserInfo } from "@/services/authService";
 import { User } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,21 +12,34 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check if user is logged in
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
+        // Check if user is logged in by verifying token exists
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
             router.push("/");
             return;
         }
 
-        try {
-            const userData = JSON.parse(storedUser) as User;
-            setUser(userData);
-        } catch (err) {
-            router.push("/");
-        } finally {
-            setLoading(false);
-        }
+        // Fetch user data using the token
+        const fetchUserData = async () => {
+            try {
+                const userData = await getUserInfo(token);
+                if (userData) {
+                    setUser(userData);
+                } else {
+                    // Invalid token or error fetching user data
+                    localStorage.removeItem("accessToken");
+                    router.push("/");
+                }
+            } catch (err) {
+                console.error("Error fetching user data:", err);
+                localStorage.removeItem("accessToken");
+                router.push("/");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
     }, [router]);
 
     if (loading) {
@@ -61,7 +75,7 @@ export default function Dashboard() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Perfil</p>
-                                    <p className="text-2xl font-semibold text-[#3A3A3A]">{user.nome}</p>
+                                    <p className="text-2xl font-semibold text-[#3A3A3A]">{user.name}</p>
                                 </div>
                             </div>
                         </div>
@@ -105,7 +119,7 @@ export default function Dashboard() {
                             </div>
                             <div className="rounded-md bg-gray-50 p-4">
                                 <p className="text-sm font-medium text-gray-500">Nome</p>
-                                <p className="mt-1 text-[#3A3A3A]">{user.nome}</p>
+                                <p className="mt-1 text-[#3A3A3A]">{user.name}</p>
                             </div>
                             <div className="rounded-md bg-gray-50 p-4">
                                 <p className="text-sm font-medium text-gray-500">Email</p>
@@ -119,7 +133,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Admin Section */}
-                    {user.role === "ADMINISTRADOR" && (
+                    {user.role === "admin" && (
                         <div className="mt-6 rounded-lg bg-white p-6 shadow-md">
                             <h2 className="text-lg font-medium text-[#3A3A3A]">Área do Administrador</h2>
                             <div className="mt-4 rounded-md bg-[#49BC99]/10 p-4">

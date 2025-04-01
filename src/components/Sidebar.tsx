@@ -20,20 +20,29 @@ export default function Sidebar({ user }: SidebarProps) {
     };
 
     const menuItems = [
-        { name: "Dashboard", icon: "📊", path: "/dashboard" },
-        { name: "Perfil", icon: "👤", path: "/dashboard/profile" },
-        ...(user?.role === "ADMINISTRADOR"
-            ? [{ name: "Administração", icon: "⚙️", path: "/dashboard/admin" }]
-            : []),
-        { name: "Relatórios", icon: "📈", path: "/dashboard/reports" },
+        {
+            name: "Dashboard", icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>, path: "/dashboard"
+        },
+        {
+            name: "Clientes", icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>, path: "/dashboard/clients"
+        },
+        {
+            name: "Contatos", icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>, path: "/dashboard/contacts"
+        },
     ];
 
     return (
         <div
-            className={`flex h-screen flex-col bg-white shadow-md transition-all duration-300 ${isCollapsed ? "w-20" : "w-64"
+            className={`flex h-screen flex-col bg-[#3A3A3A] text-white shadow-md transition-all duration-300 ${isCollapsed ? "w-20" : "w-64"
                 }`}
         >
-            <div className="flex items-center justify-between border-b border-gray-200 p-4">
+            <div className="flex items-center justify-between border-b border-gray-700 p-4">
                 <div className={`flex items-center ${isCollapsed ? "justify-center w-full" : ""}`}>
                     <Image
                         src="/images/logoColet.png"
@@ -45,11 +54,11 @@ export default function Sidebar({ user }: SidebarProps) {
                             e.currentTarget.src = "/vercel.svg";
                         }}
                     />
-                    {!isCollapsed && <h1 className="text-lg font-bold text-[#3A3A3A]">Colet Sistemas</h1>}
+                    {!isCollapsed && <h1 className="text-lg font-bold text-white">Colet Sistemas</h1>}
                 </div>
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className={`text-gray-500 hover:text-[#09A08D] ${isCollapsed ? "hidden" : ""}`}
+                    className={`text-gray-400 hover:text-white absolute ${isCollapsed ? "right-2" : "right-4"}`}
                 >
                     {isCollapsed ? "›" : "‹"}
                 </button>
@@ -61,27 +70,27 @@ export default function Sidebar({ user }: SidebarProps) {
                         <li key={item.name}>
                             <Link
                                 href={item.path}
-                                className="flex items-center rounded-md px-4 py-3 text-gray-700 hover:bg-[#09A08D]/10 hover:text-[#09A08D]"
+                                className="flex items-center rounded-md px-4 py-3 text-gray-300 hover:bg-[#4A4A4A] hover:text-white transition-colors duration-200"
                             >
-                                <span className="mr-3 text-xl">{item.icon}</span>
-                                {!isCollapsed && <span>{item.name}</span>}
+                                <span className="mr-3">{item.icon}</span>
+                                {!isCollapsed && <span className="font-medium">{item.name}</span>}
                             </Link>
                         </li>
                     ))}
                 </ul>
             </div>
 
-            <div className="border-t border-gray-200 p-4">
+            <div className="border-t border-gray-700 p-4">
                 <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"}`}>
                     {!isCollapsed && (
                         <div className="overflow-hidden text-ellipsis">
-                            <p className="text-sm font-medium text-gray-700">{user.nome}</p>
-                            <p className="text-xs text-gray-500">{user.role}</p>
+                            <p className="text-sm font-medium text-gray-300">{user.name} <span className="text-xs text-gray-400">({user.role})</span></p>
+                            <p className="text-xs text-gray-400">{user.email}</p>
                         </div>
                     )}
                     <button
                         onClick={handleLogout}
-                        className="rounded-full bg-[#09A08D] p-2 text-white hover:bg-[#3C787A]"
+                        className="rounded-full bg-[#09A08D] p-2 text-white hover:bg-[#078275] transition-colors duration-200"
                         title="Sair"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -23,11 +23,13 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const user = await loginUser(email, password);
-      if (user) {
-        // Store user info in localStorage
-        localStorage.setItem("user", JSON.stringify(user));
+      const authData = await loginUser(email, password);
+      if (authData && authData.accessToken) {
+        // Store token in localStorage
+        localStorage.setItem("accessToken", authData.accessToken);
         router.push("/dashboard");
+      } else {
+        setError("Email ou senha inválidos");
       }
     } catch (err) {
       setError("Email ou senha inválidos");

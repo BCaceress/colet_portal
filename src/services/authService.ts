@@ -1,40 +1,55 @@
 import { User } from "@/types/auth";
+import { API_URL } from "@/config/constants";
 
-const API_URL = "http://localhost:3001/";
-
-export async function loginUser(email: string, password: string): Promise<User | null> {
+export async function loginUser(email: string, password: string): Promise<{ accessToken: string } | null> {
     try {
-        // Fetch users from the API
-        const response = await fetch(API_URL);
+        const formData = new URLSearchParams();
+        formData.append('email', email);
+        formData.append('password', password);
+
+        const response = await fetch(`${API_URL}auth/signin`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData
+        });
+
         if (!response.ok) {
-            throw new Error("Failed to fetch users");
+            throw new Error("Login failed");
         }
 
-        const users: User[] = await response.json();
-
-        // Find user with matching email and password
-        const user = users.find(u => u.email === email && u.senha === password);
-
-        if (user) {
-            // Update lastAccess time
-            const updatedUser = {
-                ...user,
-                ultimoAcesso: new Date().toISOString()
-            };
-
-            return updatedUser;
-        }
-
-        return null;
+        const data = await response.json();
+        return data;
     } catch (error) {
         console.error("Login error:", error);
         throw error;
     }
 }
 
+export async function getUserInfo(token: string): Promise<User | null> {
+    try {
+        const response = await fetch(`${API_URL}auth/me`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch user info");
+        }
+
+        const userData = await response.json();
+        return userData;
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+        throw error;
+    }
+}
+
 export async function registerUser(nome: string, email: string, senha: string, role: string): Promise<void> {
     try {
-        // Create form data
         const formData = new URLSearchParams();
         formData.append('name', nome);
         formData.append('email', email);

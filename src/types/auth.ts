@@ -2,10 +2,8 @@ export type UserRole = "ADMINISTRADOR" | "SUPORTE" | "DESENVOLVIMENTO" | "IMPLAN
 
 export interface User {
     id: string;
-    nome: string;
+    name: string;  
     email: string;
     senha: string;
     role: UserRole;
-   // dataAdmissao: string;
-    //ultimoAcesso: string | null;
 }
