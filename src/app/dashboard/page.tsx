@@ -1,6 +1,6 @@
 "use client";
 
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/layout/Sidebar";
 import { getUserInfo } from "@/services/authService";
 import { User } from "@/types/auth";
 import { useRouter } from "next/navigation";

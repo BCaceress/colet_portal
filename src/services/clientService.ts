@@ -1,5 +1,5 @@
+import { API_URL } from "@/constants/api";
 import { Client } from "@/types/client";
-import { API_URL } from "@/config/constants";
 
 export async function getClients(token: string): Promise<Client[]> {
     try {

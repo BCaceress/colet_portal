@@ -2,7 +2,7 @@
 
 import AddClientModal from "@/components/clients/AddClientModal";
 import DeleteClientModal from "@/components/clients/DeleteClientModal";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/layout/Sidebar";
 import { getUserInfo } from "@/services/authService";
 import { createClient, deleteClient, getClients } from "@/services/clientService";
 import { User } from "@/types/auth";

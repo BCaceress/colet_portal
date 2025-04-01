@@ -1,5 +1,5 @@
+import { API_URL } from "@/constants/api";
 import { User } from "@/types/auth";
-import { API_URL } from "@/config/constants";
 
 export async function loginUser(email: string, password: string): Promise<{ accessToken: string } | null> {
     try {

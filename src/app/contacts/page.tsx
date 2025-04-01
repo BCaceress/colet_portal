@@ -1,6 +1,6 @@
 "use client";
 
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/layout/Sidebar";
 import { getUserInfo } from "@/services/authService";
 import { getContacts } from "@/services/contactService";
 import { User } from "@/types/auth";
@@ -329,8 +329,8 @@ export default function Contacts() {
                                                     <td className="whitespace-nowrap px-6 py-4">
                                                         <span
                                                             className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${contact.fl_ativo
-                                                                    ? "bg-green-100 text-green-800"
-                                                                    : "bg-red-100 text-red-800"
+                                                                ? "bg-green-100 text-green-800"
+                                                                : "bg-red-100 text-red-800"
                                                                 }`}
                                                         >
                                                             {contact.fl_ativo ? "Ativo" : "Inativo"}
