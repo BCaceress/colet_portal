@@ -3,7 +3,7 @@
 import { User } from "@/types/auth";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface SidebarProps {
@@ -12,6 +12,7 @@ interface SidebarProps {
 
 export default function Sidebar({ user }: SidebarProps) {
     const router = useRouter();
+    const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const handleLogout = () => {
@@ -42,7 +43,7 @@ export default function Sidebar({ user }: SidebarProps) {
             className={`flex h-screen flex-col bg-[#3A3A3A] text-white shadow-md transition-all duration-300 ${isCollapsed ? "w-20" : "w-64"
                 }`}
         >
-            <div className="flex items-center justify-between border-b border-gray-700 p-4">
+            <div className="flex items-center justify-between border-b border-gray-700 p-4 bg-[#2A2A2A]">
                 <div className={`flex items-center ${isCollapsed ? "justify-center w-full" : ""}`}>
                     <Image
                         src="/images/logoColet.png"
@@ -66,17 +67,27 @@ export default function Sidebar({ user }: SidebarProps) {
 
             <div className="flex-1 overflow-y-auto py-4">
                 <ul className="space-y-2 px-2">
-                    {menuItems.map((item) => (
-                        <li key={item.name}>
-                            <Link
-                                href={item.path}
-                                className="flex items-center rounded-md px-4 py-3 text-gray-300 hover:bg-[#4A4A4A] hover:text-white transition-colors duration-200"
-                            >
-                                <span className="mr-3">{item.icon}</span>
-                                {!isCollapsed && <span className="font-medium">{item.name}</span>}
-                            </Link>
-                        </li>
-                    ))}
+                    {menuItems.map((item) => {
+                        // Fixed active state logic
+                        const isActive = item.path === '/dashboard'
+                            ? pathname === '/dashboard'
+                            : pathname === item.path || pathname.startsWith(`${item.path}/`);
+
+                        return (
+                            <li key={item.name}>
+                                <Link
+                                    href={item.path}
+                                    className={`flex items-center rounded-md px-4 py-3 transition-colors duration-200 
+                                    ${isActive
+                                            ? 'bg-[#09A08D] text-white'
+                                            : 'text-gray-300 hover:bg-[#4A4A4A] hover:text-white'}`}
+                                >
+                                    <span className="mr-3">{item.icon}</span>
+                                    {!isCollapsed && <span className="font-medium">{item.name}</span>}
+                                </Link>
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
 

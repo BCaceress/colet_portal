@@ -1,68 +1,47 @@
-import { API_URL } from "@/constants/api";
-import { Client } from "@/types/client";
+import { Client } from '@/types/client';
+import { apiDelete, apiGet, apiPost, apiPut } from './api';
 
-export async function getClients(token: string): Promise<Client[]> {
-    try {
-        const response = await fetch(`${API_URL}clients`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch clients");
-        }
-
-        const clients = await response.json();
-        return clients;
-    } catch (error) {
-        console.error("Error fetching clients:", error);
-        throw error;
-    }
+// Type for client creation payload
+export interface CreateClientPayload {
+    ds_nome: string;
+    ds_razao_social?: string;
+    nr_cnpj: string;
+    nr_inscricao_estadual?: string;
+    fl_ativo: boolean;
+    // ...other fields
 }
 
-export async function createClient(token: string, client: Omit<Client, 'id_client'>): Promise<Client> {
-    try {
-        const response = await fetch(`${API_URL}clients`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(client)
-        });
+/**
+ * Get all clients
+ */
+export const getClients = async (token: string): Promise<Client[]> => {
+    return apiGet<Client[]>('/clients', token);
+};
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to create client");
-        }
+/**
+ * Get client by ID
+ */
+export const getClientById = async (token: string, id: number): Promise<Client> => {
+    return apiGet<Client>(`/clients/${id}`, token);
+};
 
-        const newClient = await response.json();
-        return newClient;
-    } catch (error) {
-        console.error("Error creating client:", error);
-        throw error;
-    }
-}
+/**
+ * Create a new client
+ */
+export const createClient = async (token: string, clientData: CreateClientPayload): Promise<Client> => {
+    return apiPost<Client>('/clients', clientData, token);
+};
 
-export async function deleteClient(token: string, clientId: number): Promise<void> {
-    try {
-        const response = await fetch(`${API_URL}clients/${clientId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+/**
+ * Update an existing client
+ */
+export const updateClient = async (token: string, id: number, clientData: Partial<Client>): Promise<Client> => {
+    return apiPut<Client>(`/clients/${id}`, clientData, token);
+};
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to delete client");
-        }
-
-        return Promise.resolve();
-    } catch (error) {
-        console.error("Error deleting client:", error);
-        throw error;
-    }
-}
+/**
+ * Delete a client
+ */
+export const deleteClient = async (token: string, id: number): Promise<void> => {
+    return apiDelete(`/clients/${id}`, token);
+};

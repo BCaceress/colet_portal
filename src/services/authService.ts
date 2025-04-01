@@ -7,7 +7,7 @@ export async function loginUser(email: string, password: string): Promise<{ acce
         formData.append('email', email);
         formData.append('password', password);
 
-        const response = await fetch(`${API_URL}auth/signin`, {
+        const response = await fetch(`${API_URL}/auth/signin`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -29,7 +29,7 @@ export async function loginUser(email: string, password: string): Promise<{ acce
 
 export async function getUserInfo(token: string): Promise<User | null> {
     try {
-        const response = await fetch(`${API_URL}auth/me`, {
+        const response = await fetch(`${API_URL}/auth/me`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -56,7 +56,7 @@ export async function registerUser(nome: string, email: string, senha: string, r
         formData.append('password', senha);
         formData.append('role', role);
 
-        const response = await fetch(`${API_URL}auth/signup`, {
+        const response = await fetch(`${API_URL}/auth/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

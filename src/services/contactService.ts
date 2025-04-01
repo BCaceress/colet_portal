@@ -3,7 +3,7 @@ import { Contact } from "@/types/contact";
 
 export async function getContacts(token: string): Promise<Contact[]> {
     try {
-        const response = await fetch(`${API_URL}contacts`, {
+        const response = await fetch(`${API_URL}/contacts`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
