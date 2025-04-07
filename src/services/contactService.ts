@@ -64,3 +64,25 @@ export async function createContact(token: string, contactData: Omit<Contact, "i
         throw error;
     }
 }
+
+export async function deleteContact(token: string, contactId: number): Promise<void> {
+    try {
+        const response = await fetch(`${API_URL}/contacts/${contactId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+
+        // Return nothing on successful deletion
+        return;
+    } catch (error) {
+        console.error("Failed to delete contact:", error);
+        throw error;
+    }
+}

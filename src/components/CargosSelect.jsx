@@ -76,7 +76,7 @@ const CustomJobTitleSelect = ({ value, onChange, placeholder }) => {
                     width: '100%',
                     padding: '8px',
                     marginBottom: isCustom ? '8px' : '0',
-                    color: '#374151', // Dark gray color (text-gray-800 equivalent)
+                    color: '#374151',
                     borderRadius: '0.375rem',
                     borderColor: '#D1D5DB',
                     fontSize: '0.875rem'
@@ -98,7 +98,7 @@ const CustomJobTitleSelect = ({ value, onChange, placeholder }) => {
                     style={{
                         width: '100%',
                         padding: '8px',
-                        color: '#374151', // Dark gray color (text-gray-800 equivalent)
+                        color: '#374151', 
                         borderRadius: '0.375rem',
                         borderColor: '#D1D5DB',
                         fontSize: '0.875rem'

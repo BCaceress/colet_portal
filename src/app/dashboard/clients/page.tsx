@@ -1,14 +1,13 @@
 "use client";
 
-import AddClientModal from "@/components/clients/AddClientModal";
-import DeleteClientModal from "@/components/clients/DeleteClientModal";
 import Sidebar from "@/components/layout/Sidebar";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { getUserInfo } from "@/services/authService";
 import { createClient, deleteClient, getClients } from "@/services/clientService";
 import { User } from "@/types/auth";
 import { Client } from "@/types/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function ClientsPage() {
     const router = useRouter();
@@ -23,7 +22,6 @@ export default function ClientsPage() {
 
     // Add search state
     const [searchTerm, setSearchTerm] = useState("");
-    const [filteredClients, setFilteredClients] = useState<Client[]>([]);
 
     // Add state for showing inactive clients
     const [showInactive, setShowInactive] = useState(false);
@@ -74,7 +72,8 @@ export default function ClientsPage() {
         fetchData();
     }, [router]);
 
-    useEffect(() => {
+    // Replace the useEffect for filtering with useMemo
+    const filteredClients = useMemo(() => {
         // Sort and filter clients based on searchTerm and showInactive state
         let filtered = [...clients].sort((a, b) =>
             a.ds_nome.localeCompare(b.ds_nome)
@@ -96,7 +95,7 @@ export default function ClientsPage() {
             );
         }
 
-        setFilteredClients(filtered);
+        return filtered;
     }, [searchTerm, clients, showInactive]);
 
     const openAddModal = () => {
@@ -203,7 +202,8 @@ export default function ClientsPage() {
 
     // Component to display contacts when expanded
     const ClientContactsRow = ({ client, isExpanded }: { client: Client; isExpanded: boolean }) => {
-        if (!isExpanded || !client.contatos || client.contatos.length === 0) {
+        // Check if clientesContatos exists and has items instead of contatos
+        if (!isExpanded || !client.clientesContatos || client.clientesContatos.length === 0) {
             return null;
         }
 
@@ -211,7 +211,6 @@ export default function ClientsPage() {
             <tr>
                 <td colSpan={6} className="px-0 py-0">
                     <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Contatos</h4>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-100">
@@ -231,31 +230,35 @@ export default function ClientsPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                    {client.contatos.map((contact) => (
-                                        <tr key={contact.id_contato}>
-                                            <td className="px-6 py-2 text-sm text-gray-900">
-                                                {contact.ds_nome}
-                                            </td>
-                                            <td className="px-6 py-2 text-sm text-gray-900">
-                                                {contact.ds_cargo || "-"}
-                                            </td>
-                                            <td className="px-6 py-2 text-sm text-gray-900">
-                                                {contact.ds_email ? (
-                                                    <a href={`mailto:${contact.ds_email}`} className="text-blue-600 hover:underline">
-                                                        {contact.ds_email}
-                                                    </a>
-                                                ) : "-"}
-                                            </td>
-                                            <td className="px-6 py-2 text-sm text-gray-900">
-                                                {contact.ds_telefone || "-"}
-                                                {contact.fl_whatsapp && contact.ds_telefone && (
-                                                    <span className="ml-2 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                                        WhatsApp
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {client.clientesContatos.map((clienteContato) => {
+                                        // Extract contact data from the nested structure
+                                        const contact = clienteContato.contato;
+                                        return (
+                                            <tr key={contact.id_contato}>
+                                                <td className="px-6 py-2 text-sm text-gray-900">
+                                                    {contact.ds_nome}
+                                                </td>
+                                                <td className="px-6 py-2 text-sm text-gray-900">
+                                                    {contact.ds_cargo || "-"}
+                                                </td>
+                                                <td className="px-6 py-2 text-sm text-gray-900">
+                                                    {contact.ds_email ? (
+                                                        <a href={`mailto:${contact.ds_email}`} className="text-blue-600 hover:underline">
+                                                            {contact.ds_email}
+                                                        </a>
+                                                    ) : "-"}
+                                                </td>
+                                                <td className="px-6 py-2 text-sm text-gray-900">
+                                                    {contact.ds_telefone || "-"}
+                                                    {contact.fl_whatsapp && contact.ds_telefone && (
+                                                        <span className="ml-2 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                                                            WhatsApp
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -266,11 +269,7 @@ export default function ClientsPage() {
     };
 
     if (loading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-50">
-                <div className="text-[#09A08D]">Carregando...</div>
-            </div>
-        );
+        return <LoadingSpinner fullScreen message="Carregando clientes..." />;
     }
 
     if (!user) return null;
@@ -410,7 +409,7 @@ export default function ClientsPage() {
                                                     <td className="px-6 py-4 text-sm text-gray-900">
                                                         <div className="flex items-center">
                                                             {/* Add expand button if client has contacts */}
-                                                            {client.contatos && client.contatos.length > 0 && (
+                                                            {client.clientesContatos && client.clientesContatos.length > 0 && (
                                                                 <button
                                                                     onClick={(e) => toggleClientExpansion(client.id_cliente, e)}
                                                                     className="mr-2 text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -509,133 +508,13 @@ export default function ClientsPage() {
                 />
             )}
 
-            {/* Client Details Modal */}
-            {isViewModalOpen && selectedClient && (
-                <div className="fixed inset-0 z-10 overflow-y-auto">
-                    <div className="flex min-h-screen items-center justify-center px-4 py-6 text-center sm:p-0">
-                        <div
-                            className="fixed inset-0 transition-opacity duration-300"
-                            aria-hidden="true"
-                            onClick={() => setIsViewModalOpen(false)}
-                        >
-                            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-                        </div>
-
-                        <div className="inline-block transform overflow-hidden rounded-xl bg-white text-left align-bottom shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
-                            <div className="bg-white px-5 pt-5 pb-4 sm:p-6">
-                                <div className="sm:flex sm:items-start">
-                                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-12 sm:w-12">
-                                        <svg className="h-7 w-7 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                    </div>
-                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <h3 className="text-xl font-semibold leading-6 text-gray-900">Detalhes do Cliente</h3>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 max-h-[60vh] overflow-y-auto px-1 py-2">
-                                    <div className="divide-y divide-gray-200">
-                                        <div className="py-4">
-                                            <h4 className="text-lg font-medium text-gray-900 mb-3">Identificação</h4>
-                                            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Razão Social</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_nome}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Nome Fantasia</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_razao_social || "-"}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">CNPJ</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{formatCNPJ(selectedClient.nr_cnpj)}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Inscrição Estadual</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.nr_inscricao_estadual || "-"}</dd>
-                                                </div>
-                                                <div className="sm:col-span-2">
-                                                    <dt className="text-sm font-medium text-gray-500">Site</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">
-                                                        {selectedClient.ds_site ? (
-                                                            <a href={selectedClient.ds_site} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                                                {selectedClient.ds_site}
-                                                            </a>
-                                                        ) : "-"}
-                                                    </dd>
-                                                </div>
-                                            </dl>
-                                        </div>
-
-                                        <div className="py-4">
-                                            <h4 className="text-lg font-medium text-gray-900 mb-3">Contrato</h4>
-                                            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Situação</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_situacao || "-"}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Sistema</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_sistema || "-"}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Contrato</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_contrato || "-"}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Valor Hora Técnica</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">
-                                                        {selectedClient.nr_hora_tecnica ? `R$ ${parseFloat(selectedClient.nr_hora_tecnica).toFixed(2)}` : "-"}
-                                                    </dd>
-                                                </div>
-                                            </dl>
-                                        </div>
-
-                                        <div className="py-4">
-                                            <h4 className="text-lg font-medium text-gray-900 mb-3">Localização</h4>
-                                            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">UF</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_uf || "-"}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Cidade</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_cidade || "-"}</dd>
-                                                </div>
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Bairro</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_bairro || "-"}</dd>
-                                                </div>
-                                                <div className="sm:col-span-2">
-                                                    <dt className="text-sm font-medium text-gray-500">Endereço</dt>
-                                                    <dd className="mt-1 text-sm text-gray-900">{selectedClient.ds_endereco || "-"}</dd>
-                                                </div>
-                                            </dl>
-                                        </div>
-
-                                        {selectedClient.ds_observacao && (
-                                            <div className="py-4">
-                                                <h4 className="text-lg font-medium text-gray-900 mb-3">Observações</h4>
-                                                <p className="text-sm text-gray-900 whitespace-pre-line">{selectedClient.ds_observacao}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-gray-50 px-5 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-gray-200">
-                                <button
-                                    type="button"
-                                    className="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#09A08D] focus:ring-offset-2 transition-colors sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                    onClick={() => setIsViewModalOpen(false)}
-                                >
-                                    Fechar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Use new ViewClientModal component */}
+            {selectedClient && (
+                <ViewClientModal
+                    isOpen={isViewModalOpen}
+                    onClose={() => setIsViewModalOpen(false)}
+                    client={selectedClient}
+                />
             )}
         </div>
     );

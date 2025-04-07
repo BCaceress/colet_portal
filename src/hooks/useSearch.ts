@@ -1,20 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
-export function useSearch<T>(
+export function useSearch<T extends object>(
     items: T[],
     searchKeys: (keyof T)[],
     initialShowInactive: boolean = false
 ) {
     const [searchTerm, setSearchTerm] = useState("");
     const [showInactive, setShowInactive] = useState(initialShowInactive);
-    const [filteredItems, setFilteredItems] = useState<T[]>(items);
 
-    useEffect(() => {
+    // Use useMemo instead of useState + useEffect to avoid potential infinite loops
+    const filteredItems = useMemo(() => {
         // First, filter by active status
         let filtered = [...items];
-        if (!showInactive && 'fl_ativo' in items[0]) {
-            // @ts-ignore: fl_ativo might not be in T
-            filtered = filtered.filter(item => item.fl_ativo);
+        if (!showInactive && items.length > 0 && 'fl_ativo' in (items[0] || {})) {
+            filtered = filtered.filter(item =>
+                'fl_ativo' in item ? (item as any).fl_ativo : true
+            );
         }
 
         // Then, apply search term
@@ -30,7 +31,7 @@ export function useSearch<T>(
             });
         }
 
-        setFilteredItems(filtered);
+        return filtered;
     }, [items, searchTerm, showInactive, searchKeys]);
 
     return {

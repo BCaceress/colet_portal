@@ -2,7 +2,6 @@
 import { API_URL } from "@/constants/api";
 
 const API_BASE_URL = API_URL;
-// Default headers
 const defaultHeaders = {
     'Content-Type': 'application/json',
 };
@@ -13,9 +12,6 @@ const getAuthHeaders = (token: string) => ({
     Authorization: `Bearer ${token}`,
 });
 
-/**
- * Make a GET request
- */
 export const apiGet = async <T>(endpoint: string, token?: string): Promise<T> => {
     const headers = token ? getAuthHeaders(token) : defaultHeaders;
 
@@ -31,9 +27,6 @@ export const apiGet = async <T>(endpoint: string, token?: string): Promise<T> =>
     return response.json();
 };
 
-/**
- * Make a POST request
- */
 export const apiPost = async <T>(endpoint: string, data: any, token?: string): Promise<T> => {
     const headers = token ? getAuthHeaders(token) : defaultHeaders;
 
@@ -50,9 +43,6 @@ export const apiPost = async <T>(endpoint: string, data: any, token?: string): P
     return response.json();
 };
 
-/**
- * Make a PUT request
- */
 export const apiPut = async <T>(endpoint: string, data: any, token?: string): Promise<T> => {
     const headers = token ? getAuthHeaders(token) : defaultHeaders;
 
@@ -69,9 +59,7 @@ export const apiPut = async <T>(endpoint: string, data: any, token?: string): Pr
     return response.json();
 };
 
-/**
- * Make a DELETE request
- */
+
 export const apiDelete = async <T>(endpoint: string, token?: string): Promise<T> => {
     const headers = token ? getAuthHeaders(token) : defaultHeaders;
 

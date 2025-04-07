@@ -1,11 +1,13 @@
 "use client";
 
+import AnimatedSvgIllustration from "@/components/AnimatedSvgIllustration";
 import { loginUser } from "@/services/authService";
+import { motion } from 'framer-motion';
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FormEvent, useState } from "react";
+import { FiAlertCircle, FiEye, FiEyeOff, FiLock, FiMail } from 'react-icons/fi';
 
 export default function Home() {
   const router = useRouter();
@@ -16,11 +18,17 @@ export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormSubmitted(true);
     setError("");
     setLoading(true);
+
+    if (!email || !password) {
+      setError("Preencha todos os campos");
+      setLoading(false);
+      return;
+    }
 
     try {
       const authData = await loginUser(email, password);
@@ -43,43 +51,90 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#09A08D] to-[#3C787A]">
-      <div className="m-auto w-full max-w-md px-4 py-8 sm:px-6 md:max-w-lg">
-        <div className="overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300 hover:shadow-3xl">
-          <div className="bg-[#49BC99] px-6 py-8 text-center">
-            <div className="mx-auto mb-2 h-20 w-20 overflow-hidden rounded-full bg-[#3A3A3A] p-2 shadow-md transition-transform duration-300 hover:scale-105">
+    <div className="flex min-h-screen bg-slate-50">
+      {/* Left Section - With SVG illustrations */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#09A08D] to-[#3C787A] flex-col justify-center items-center px-12 py-8 relative overflow-hidden"
+      >
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
+              <path d="M 8 0 L 0 0 0 8" fill="none" stroke="white" strokeWidth="0.5" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
+
+        <div className="w-full max-w-xl mx-auto flex justify-center items-center h-full relative z-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="transform transition duration-500 hover:scale-105 w-full"
+          >
+            <AnimatedSvgIllustration />
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Right Section - Login Form */}
+      <div className="w-full md:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <div className="relative h-22 w-full mb-6">
               <Image
-                src="/images/logoColet.png"
+                src="/images/logoColetHorizontal.png"
                 alt="Colet Logo"
-                width={150}
-                height={150}
+                layout="fill"
+                objectFit="contain"
                 priority
-                className="h-full w-full object-contain"
                 onError={(e) => {
-                  e.currentTarget.src = "/vercel.svg"; // Fallback if logo isn't available
+                  e.currentTarget.src = "/vercel.svg";
                 }}
               />
             </div>
-            <h1 className="text-2xl font-bold text-white md:text-3xl">Colet Sistemas</h1>
-            <p className="mt-1 text-sm text-white/90 md:text-base">Portal de Acesso</p>
-          </div>
+          </motion.div>
 
-          <div className="p-6 md:p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-white rounded-xl shadow-lg p-8"
+          >
             {error && (
-              <div className="mb-4 rounded-md bg-red-50 p-3 animate-fadeIn" role="alert">
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mb-6 rounded-lg bg-red-50 p-4"
+                role="alert"
+              >
                 <div className="flex items-center">
-                  <FiAlertCircle className="mr-2 h-5 w-5 text-red-500" />
+                  <FiAlertCircle className="mr-3 h-5 w-5 text-red-500" />
                   <div className="text-sm font-medium text-red-700">{error}</div>
                 </div>
-              </div>
+              </motion.div>
             )}
 
-            <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+            <form className="space-y-6" onSubmit={handleSubmit} noValidate>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[#3A3A3A]">
-                  Email
-                </label>
-                <div className="mt-1 relative rounded-md">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <motion.div
+                  whileFocus={{ scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className={`flex items-center border ${formSubmitted && !email ? 'border-red-300 bg-red-50' : 'border-gray-300 focus-within:border-[#09A08D] focus-within:ring-1 focus-within:ring-[#09A08D]'} rounded-lg px-4 py-3 transition-all duration-200`}
+                >
+                  <FiMail className="h-5 w-5 text-gray-400 mr-2" />
                   <input
                     id="email"
                     name="email"
@@ -88,31 +143,31 @@ export default function Home() {
                     required
                     aria-required="true"
                     aria-invalid={formSubmitted && !email ? "true" : "false"}
-                    className={`block w-full rounded-md border ${formSubmitted && !email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-[#09A08D] focus:ring-[#09A08D]'
-                      } px-3 py-2 shadow-sm outline-none ring-opacity-50 transition-all duration-200 focus:ring-1 sm:text-sm text-black`}
-                    placeholder="seu@email.com"
+                    className="w-full border-none bg-transparent focus:ring-0 outline-none text-gray-900 placeholder-gray-500 text-sm"
+                    placeholder="Seu email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
-                  {formSubmitted && !email && (
-                    <p className="mt-1 text-xs text-red-600">Email é obrigatório</p>
-                  )}
-                </div>
+                </motion.div>
+                {formSubmitted && !email && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-2 text-xs text-red-600"
+                  >
+                    Email é obrigatório
+                  </motion.p>
+                )}
               </div>
 
               <div>
-                <div className="flex justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium text-[#3A3A3A]">
-                    Senha
-                  </label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-xs font-medium text-[#09A08D] hover:text-[#3C787A] transition-colors"
-                  >
-                    Esqueci minha senha
-                  </Link>
-                </div>
-                <div className="mt-1 relative rounded-md">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                <motion.div
+                  whileFocus={{ scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className={`flex items-center border ${formSubmitted && !password ? 'border-red-300 bg-red-50' : 'border-gray-300 focus-within:border-[#09A08D] focus-within:ring-1 focus-within:ring-[#09A08D]'} rounded-lg px-4 py-3 transition-all duration-200`}
+                >
+                  <FiLock className="h-5 w-5 text-gray-400 mr-2" />
                   <input
                     id="password"
                     name="password"
@@ -121,32 +176,48 @@ export default function Home() {
                     required
                     aria-required="true"
                     aria-invalid={formSubmitted && !password ? "true" : "false"}
-                    className={`block w-full rounded-md border ${formSubmitted && !password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-[#09A08D] focus:ring-[#09A08D]'
-                      } px-3 py-2 pr-10 shadow-sm outline-none ring-opacity-50 transition-all duration-200 focus:ring-1 sm:text-sm text-black`}
-                    placeholder="••••••••"
+                    className="w-full border-none bg-transparent focus:ring-0 outline-none text-gray-900 placeholder-gray-500 text-sm"
+                    placeholder="Sua senha"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
                     aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                     tabIndex={-1}
                   >
                     {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
                   </button>
-                  {formSubmitted && !password && (
-                    <p className="mt-1 text-xs text-red-600">Senha é obrigatória</p>
-                  )}
-                </div>
+                </motion.div>
+                {formSubmitted && !password && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-2 text-xs text-red-600"
+                  >
+                    Senha é obrigatória
+                  </motion.p>
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-medium text-[#09A08D]"
+                >
+                  Esqueci minha senha
+                </Link>
               </div>
 
               <div>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="flex w-full justify-center rounded-md bg-[#09A08D] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:bg-[#3C787A] focus:outline-none focus:ring-2 focus:ring-[#09A08D] focus:ring-offset-2 disabled:bg-[#09A08D]/70 disabled:cursor-not-allowed transform  active:translate-y-0"
+                  className="flex w-full justify-center rounded-lg bg-gradient-to-r from-[#09A08D] to-[#3C787A] px-4 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#09A08D] focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   aria-live="polite"
                 >
                   {loading ? (
@@ -155,28 +226,26 @@ export default function Home() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Entrando...
+                      <span>Entrando...</span>
                     </span>
-                  ) : "Entrar"}
-                </button>
+                  ) : (
+                    <span>Entrar</span>
+                  )}
+                </motion.button>
               </div>
             </form>
+          </motion.div>
 
-            <div className="mt-6 text-center text-sm">
-              <p className="text-[#3A3A3A]">
-                Ainda não tem uma conta?{" "}
-                <Link href="/register" className="font-medium text-[#09A08D] hover:text-[#3C787A] transition-colors">
-                  Cadastre-se
-                </Link>
-              </p>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
-            <p className="text-center text-xs text-gray-600">
-              © {new Date().getFullYear()} Colet Sistemas.
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="mt-8 text-center"
+          >
+            <p className="text-xs text-gray-500">
+              {new Date().getFullYear()} Colet Sistemas. Todos os direitos reservados.
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
